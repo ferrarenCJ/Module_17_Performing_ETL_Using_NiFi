@@ -1,51 +1,27 @@
-# Module 17 – Performing ETL Using NiFi
+# Module 17 - Performing ETL Using NiFi
 
-## Module Overview
+## Objective
 
-This module focuses on using Apache NiFi to design and implement Extract, Transform, and Load (ETL) pipelines.
+Learn how to use Apache NiFi to perform ETL operations and create data pipelines across multiple database platforms including MySQL, MongoDB, Redis, and Cassandra.
 
-Students learn:
+## Technologies
 
-- ETL concepts and data engineering use cases
-- Apache NiFi architecture
-- FlowFiles, Processors, and Connectors
-- Data ingestion from Excel
-- Loading data into MySQL
-- Creating pipelines for MongoDB
-- Creating pipelines for Redis
-- Creating pipelines for Cassandra
-- Evaluating Apache ETL tools
+- Apache NiFi
+- Docker
+- Python
+- MySQL
+- MongoDB
+- Redis
+- Cassandra
 
-Estimated Time:
-17 Hours
+## Repository Structure
 
-## Learning Outcomes
-
-By the end of this module, students will be able to:
-
-1. Identify use cases of ETL in data engineering.
-2. Identify basic elements of NiFi.
-3. Describe pros and cons of alternative Apache ETL tools.
-4. Use NiFi to create ETL pipelines.
-
-## Deliverables
-
-### Discussions
-- Discussion 17.1
-- Discussion 17.2
-
-### Coding Activities
-- Activity 17.1
-- Activity 17.2
-- Activity 17.3
-- Activity 17.4
-- Activity 17.5
-
-### Assignment
-- Assignment 17.1
-
-### Self-Study
-- Drag & Drop Activity 17.1
-- Drag & Drop Activity 17.2
-- Knowledge Check 17.1
-- Self-Study Discussion 17.1
+- 00_Environment
+- Videos
+- Knowledge_Checks
+- Discussions
+- Coding_Activities
+- Assignment
+- Resources
+- Cheat_Sheets
+- Sandbox
