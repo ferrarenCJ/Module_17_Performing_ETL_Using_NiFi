@@ -1,0 +1,422 @@
+# Required Coding Activity 17.3: Using NiFi to Create a Pipeline in MongoDB
+
+## Overview
+
+This activity demonstrates how to use Apache NiFi to build an ETL pipeline that reads documents from a MongoDB database and writes the retrieved data to JSON files. The solution uses Docker containers for both NiFi and MongoDB and leverages the GetMongo and PutFile processors.
+
+---
+
+## Learning Outcome
+
+- Use Apache NiFi to create an ETL pipeline.
+- Connect NiFi to a MongoDB database.
+- Extract documents from MongoDB collections.
+- Create JSON output files using NiFi.
+
+---
+
+# Environment
+
+## Docker Containers
+
+### NiFi
+
+```text
+Container Name: nificontainer
+Image: apache/nifi:1.13.2
+```
+
+### MongoDB
+
+```text
+Container Name: some-mongo
+Image: mongo
+```
+
+### Docker Network
+
+```text
+NifiNetwork
+```
+
+---
+
+# Step 1: Verify Docker Containers
+
+Verified that both the MongoDB and NiFi containers were running and attached to the same Docker network.
+
+### Running Containers
+
+```text
+some-mongo
+nificontainer
+```
+
+### Screenshot
+
+**Step01_Docker_Containers_Running.png**
+
+---
+
+# Step 2: Create and Verify Output Directory
+
+Opened a bash terminal inside the NiFi container and verified the output directory exists.
+
+### Directory Location
+
+```text
+/opt/nifi/nifi-current/output
+```
+
+### Verification Command
+
+```bash
+ls -l /opt/nifi/nifi-current
+```
+
+### Screenshot
+
+**Step02_Output_Directory_Exists.png**
+
+---
+
+# Step 3: Populate MongoDB
+
+Opened the MongoDB container and entered the MongoDB shell.
+
+### Start Mongo Shell
+
+```bash
+mongosh
+```
+
+### Create Database
+
+```javascript
+use sample_mflix
+```
+
+### Insert Documents
+
+```javascript
+db.movies.insertMany([
+   {
+      title: "Jurassic World: Fallen Kingdom",
+      genres: [ "Action", "Sci-Fi" ],
+      runtime: 130,
+      rated: "PG-13",
+      year: 2018,
+      directors: [ "J. A. Bayona" ],
+      cast: [ "Chris Pratt", "Bryce Dallas Howard", "Rafe Spall" ],
+      type: "movie"
+   },
+   {
+      title: "Tag",
+      genres: [ "Comedy", "Action" ],
+      runtime: 105,
+      rated: "R",
+      year: 2018,
+      directors: [ "Jeff Tomsic" ],
+      cast: [ "Annabelle Wallis", "Jeremy Renner", "Jon Hamm" ],
+      type: "movie"
+   }
+])
+```
+
+### Verify Data
+
+```javascript
+db.movies.find()
+```
+
+Successfully verified both movie documents were inserted into MongoDB.
+
+### Screenshot
+
+**Step03_MongoDB_Populated.png**
+
+---
+
+# Step 4: Create Activity17.3 Process Group
+
+Created a new process group on the NiFi root canvas.
+
+### Process Group Name
+
+```text
+Activity17.3
+```
+
+### Screenshot
+
+**Step04_Process_Group_Created.png**
+
+---
+
+# Step 5: Add GetMongo Processor
+
+Added the GetMongo processor inside the Activity17.3 process group.
+
+### Processor
+
+```text
+GetMongo
+```
+
+### Screenshot
+
+**Step05_GetMongo_Added.png**
+
+---
+
+# Step 6: Configure GetMongo
+
+Configured GetMongo to connect to the MongoDB database and collection.
+
+### Properties
+
+```text
+Mongo URI
+mongodb://some-mongo:27017
+```
+
+```text
+Mongo Database Name
+sample_mflix
+```
+
+```text
+Mongo Collection Name
+movies
+```
+
+```text
+Query
+{}
+```
+
+### Scheduling
+
+```text
+Run Schedule
+60 sec
+```
+
+### Screenshot
+
+**Step06_GetMongo_Configured.png**
+
+---
+
+# Step 7: Add PutFile Processor
+
+Added the PutFile processor to the Activity17.3 process group.
+
+### Processor
+
+```text
+PutFile
+```
+
+### Screenshot
+
+**Step07_PutFile_Added.png**
+
+---
+
+# Step 8: Configure PutFile
+
+## Settings Tab
+
+Configured Automatically Terminate Relationships:
+
+```text
+failure
+success
+```
+
+### Screenshot
+
+**Step08A_PutFile_Settings.png**
+
+---
+
+## Properties Tab
+
+Configured the output directory.
+
+### Directory
+
+```text
+/opt/nifi/nifi-current/output
+```
+
+### Additional Properties
+
+```text
+Conflict Resolution Strategy = fail
+Create Missing Directories = true
+```
+
+### Screenshot
+
+**Step08B_PutFile_Properties.png**
+
+---
+
+# Step 9: Create Processor Connection
+
+Connected GetMongo to PutFile.
+
+### Relationship Configuration
+
+```text
+failure
+original
+success
+```
+
+### Data Flow
+
+```text
+GetMongo
+    ↓
+PutFile
+```
+
+### Screenshot
+
+**Step09_Connector_Configured.png**
+
+---
+
+# Step 10: Run the Pipeline
+
+Started both processors and verified successful data flow.
+
+### Running Processors
+
+```text
+GetMongo
+PutFile
+```
+
+### Results
+
+```text
+MongoDB documents extracted successfully
+Files created by PutFile
+```
+
+### Screenshot
+
+**Step10_Processors_Running.png**
+
+---
+
+# Step 11: Verify Output Files
+
+Opened a bash terminal in the NiFi container and verified that files were being generated in the output directory.
+
+### Commands
+
+```bash
+cd /opt/nifi/nifi-current/output
+
+ls -l
+```
+
+### Results
+
+Several output files were successfully created by the NiFi pipeline.
+
+### Screenshot
+
+**Step11_Output_Files_Created.png**
+
+---
+
+# Step 12: Display JSON Output
+
+Displayed the contents of one of the files generated by NiFi.
+
+### Command
+
+```bash
+cat <filename>
+```
+
+### Example Output
+
+```json
+{
+  "_id": {
+    "$oid": "..."
+  },
+  "title": "Tag",
+  "genres": [
+    "Comedy",
+    "Action"
+  ],
+  "runtime": 105,
+  "rated": "R",
+  "year": 2018,
+  "directors": [
+    "Jeff Tomsic"
+  ],
+  "cast": [
+    "Annabelle Wallis",
+    "Jeremy Renner",
+    "Jon Hamm"
+  ],
+  "type": "movie"
+}
+```
+
+### Screenshot
+
+**Step12_JSON_File_Content.png**
+
+---
+
+# ETL Pipeline Architecture
+
+```text
+MongoDB
+(sample_mflix.movies)
+        │
+        ▼
+    GetMongo
+        │
+        ▼
+     PutFile
+        │
+        ▼
+ JSON Output Files
+```
+
+---
+
+# Results
+
+Successfully:
+
+✅ Created and configured a MongoDB database
+
+✅ Inserted movie documents into MongoDB
+
+✅ Configured GetMongo to extract MongoDB documents
+
+✅ Configured PutFile to generate output files
+
+✅ Built a NiFi ETL pipeline
+
+✅ Generated JSON output files
+
+✅ Verified JSON contents using Linux commands
+
+---
+
+# Conclusion
+
+This activity demonstrated how Apache NiFi can connect to a MongoDB database, extract collection data using the GetMongo processor, and write the resulting JSON documents to files using the PutFile processor. The completed pipeline successfully extracted movie records from the `sample_mflix.movies` collection and generated JSON files in the NiFi output directory.
